@@ -11,7 +11,6 @@ import { api } from "../../../services/api";
 import { useAuth } from "../../../hooks/auth";
 import { useLesson } from "../../../hooks/lesson";
 import { useToast } from "../../../hooks/toast";
-import { useModule } from "../../../hooks/module";
 
 interface AddLessonModal {
   isOpen: boolean;
@@ -26,8 +25,7 @@ const AddLessonModal: React.FC<AddLessonModal> = ({
 }) => {
   const { addToast } = useToast();
   const { requestOptions } = useAuth();
-  const { setSelectedModule } = useModule();
-  const { lessons, setLessons } = useLesson();
+  const { lessons, setLessons, selectedLessonByName } = useLesson();
 
   const handleCreateLesson = useCallback(
     async (data) => {
@@ -45,7 +43,6 @@ const AddLessonModal: React.FC<AddLessonModal> = ({
 
         onRequestClose();
         setLessons(lessonsState);
-        setSelectedModule(response.data.module_id);
 
         addToast({
           title: "Aula criado",
@@ -60,41 +57,48 @@ const AddLessonModal: React.FC<AddLessonModal> = ({
         });
       }
     },
-    [
-      addToast,
-      requestOptions,
-      lessons,
-      onRequestClose,
-      setLessons,
-      setSelectedModule,
-    ]
+    [addToast, requestOptions, lessons, onRequestClose, setLessons]
   );
 
   const handleEditLesson = useCallback(
     async (data) => {
       try {
         const lessonsState = lessons;
+        const lesson = lessonsState.find(
+          (item) => item.name === selectedLessonByName
+        );
+
+        if (!lesson) {
+          throw new Error("Alua informada não encontrada");
+        }
+
         const request = {
           name: data.name,
           lesson_date: data.classDate,
         };
 
-        const response = await api.post("lessons", request, requestOptions());
+        const response = await api.put(
+          `lessons/${lesson.id}`,
+          request,
+          requestOptions()
+        );
 
         lessonsState.push(response.data);
+        const newState = lessonsState.filter(
+          (item) => item.name !== selectedLessonByName
+        );
 
         onRequestClose();
-        setLessons(lessonsState);
-        setSelectedModule(response.data.module_id);
+        setLessons(newState);
 
         addToast({
-          title: "Aula criado",
+          title: "Aula editada",
           type: "success",
-          description: `Aula de ${response.data.name} criada com sucesso.`,
+          description: `Aula editada com sucesso.`,
         });
       } catch (error) {
         addToast({
-          title: "Erro na criação da aula!",
+          title: "Erro na edição da aula!",
           type: "error",
           description: error.message,
         });
@@ -106,9 +110,17 @@ const AddLessonModal: React.FC<AddLessonModal> = ({
       lessons,
       onRequestClose,
       setLessons,
-      setSelectedModule,
+      selectedLessonByName,
     ]
   );
+
+  const handleSubmit = async (data: any) => {
+    if (isEditing) {
+      await handleEditLesson(data);
+    } else {
+      await handleCreateLesson(data);
+    }
+  };
 
   return (
     <Modal
@@ -128,7 +140,7 @@ const AddLessonModal: React.FC<AddLessonModal> = ({
       <Container>
         <h1>Aulas</h1>
 
-        <Form onSubmit={handleCreateLesson}>
+        <Form onSubmit={handleSubmit}>
           <Input name="name" type="text" placeholder="Nome" />
 
           <Input name="classDate" type="date" />

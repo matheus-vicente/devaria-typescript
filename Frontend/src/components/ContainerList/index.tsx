@@ -4,9 +4,11 @@ import { ListItem } from "./ListItem";
 import { AddModuleModal } from "./AddModuleModal";
 import { AddLessonModal } from "./AddLessonModal";
 
-import { Container } from "./styles";
+import { useAuth } from "../../hooks/auth";
 import { useModule } from "../../hooks/module";
 import { useLesson } from "../../hooks/lesson";
+
+import { Container } from "./styles";
 
 interface ListItems {
   title: string;
@@ -14,13 +16,13 @@ interface ListItems {
 }
 
 const ContainerList: React.FC<ListItems> = ({ title, isLesson }) => {
+  const { user } = useAuth();
   const { modules } = useModule();
   const { lessons } = useLesson();
 
   const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
-  const [isEditingModule, setIsEditingModule] = useState(false);
-  const [isEditingLesson, setIsEditingLesson] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleOpenModal = useCallback(() => {
     if (isLesson) {
@@ -31,8 +33,7 @@ const ContainerList: React.FC<ListItems> = ({ title, isLesson }) => {
   }, [isLesson]);
 
   const handleCloseModal = useCallback(() => {
-    setIsEditingLesson(false);
-    setIsEditingModule(false);
+    setIsEditing(false);
     setIsModuleModalOpen(false);
     setIsLessonModalOpen(false);
   }, []);
@@ -45,11 +46,22 @@ const ContainerList: React.FC<ListItems> = ({ title, isLesson }) => {
         {isLesson
           ? lessons && // Verificando se há lessons
             lessons.map((lesson) => (
-              <ListItem key={lesson.id} name={lesson.name} />
+              <ListItem
+                isLesson
+                key={lesson.id}
+                name={lesson.name}
+                setIsEditing={setIsEditing}
+                openModal={setIsLessonModalOpen}
+              />
             ))
           : modules && // Verificando se há modules
             modules.map((module) => (
-              <ListItem key={module.id} name={module.name} />
+              <ListItem
+                key={module.id}
+                name={module.name}
+                setIsEditing={setIsEditing}
+                openModal={setIsModuleModalOpen}
+              />
             ))}
       </ul>
 
@@ -57,16 +69,18 @@ const ContainerList: React.FC<ListItems> = ({ title, isLesson }) => {
         className="container-modules-button"
         type="button"
         onClick={handleOpenModal}
+        disabled={!user.admin}
       >
         Adicionar
       </button>
 
       <AddModuleModal
+        isEditing={isEditing}
         isOpen={isModuleModalOpen}
         onRequestClose={handleCloseModal}
       />
       <AddLessonModal
-        isEditing={isEditingLesson}
+        isEditing={isEditing}
         isOpen={isLessonModalOpen}
         onRequestClose={handleCloseModal}
       />

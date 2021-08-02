@@ -14,7 +14,7 @@ interface ButtonModuleProps {
 }
 
 const ButtonModule: React.FC<ButtonModuleProps> = ({ module }) => {
-  const { setSelectedModule } = useModule();
+  const { setSelectedModuleByName } = useModule();
   const { lessons, setLessonsToBeShown } = useLesson();
 
   const allLessonsForThisModule = lessons.filter(
@@ -26,9 +26,9 @@ const ButtonModule: React.FC<ButtonModuleProps> = ({ module }) => {
       (lesson) => lesson.module_id === module.id
     );
 
-    setSelectedModule(module.id);
+    setSelectedModuleByName(module.id);
     setLessonsToBeShown(lessonsToBeShow);
-  }, [lessons, module.id, setSelectedModule, setLessonsToBeShown]);
+  }, [lessons, module.id, setSelectedModuleByName, setLessonsToBeShown]);
 
   return (
     <Container onClick={handleSetModuleButton}>

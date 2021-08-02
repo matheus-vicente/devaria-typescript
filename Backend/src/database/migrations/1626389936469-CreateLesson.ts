@@ -27,7 +27,6 @@ export class CreateLesson1626389936469 implements MigrationInterface {
           {
             name: "module_id",
             type: "uuid",
-            isUnique: true,
           },
           {
             name: "created_at",

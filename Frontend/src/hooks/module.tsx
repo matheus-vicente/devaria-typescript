@@ -20,15 +20,15 @@ export type ModuleData = {
 interface ModuleContextData {
   modules: ModuleData[];
   setModules(data: ModuleData[]): void;
-  selectedModule: string;
-  setSelectedModule(id: string): void;
+  selectedModuleByName: string;
+  setSelectedModuleByName(id: string): void;
 }
 
 const ModuleContext = createContext<ModuleContextData>({} as ModuleContextData);
 
 function ModuleProvider({ children }: ModuleProviderProps) {
   const [modules, setModules] = useState([] as ModuleData[]);
-  const [selectedModule, setSelectedModule] = useState("");
+  const [selectedModuleByName, setSelectedModuleByName] = useState("");
 
   useEffect(() => {
     async function loadModules() {
@@ -45,8 +45,8 @@ function ModuleProvider({ children }: ModuleProviderProps) {
       value={{
         modules,
         setModules,
-        selectedModule,
-        setSelectedModule,
+        selectedModuleByName,
+        setSelectedModuleByName,
       }}
     >
       {children}

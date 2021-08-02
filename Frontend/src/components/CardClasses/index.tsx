@@ -12,9 +12,9 @@ interface CardClassesProps {
 }
 
 const CardClasses: React.FC<CardClassesProps> = ({ lesson }) => {
-  const { modules, selectedModule } = useModule();
+  const { modules, selectedModuleByName } = useModule();
 
-  const module = modules.find((item) => item.id === selectedModule);
+  const module = modules.find((item) => item.id === selectedModuleByName);
 
   const date = new Date(lesson.lesson_date);
   const formatedDate = format(date, "'Dia:' dd/MM/YYY");

@@ -1,14 +1,15 @@
+import React from "react";
 import moduleIconImg from "../../assets/img/module-icon.svg";
 
+import { useModule } from "../../hooks/module";
+import { useLesson } from "../../hooks/lesson";
 import { Header } from "../../components/Header";
 import { ButtonModule } from "../../components/ButtonModule";
 import { CardClasses } from "../../components/CardClasses";
 
 import { Content, Title, Section, ClassTitle, CardWrapper } from "./styles";
-import { useModule } from "../../hooks/module";
-import { useLesson } from "../../hooks/lesson";
 
-function Home() {
+const Home: React.FC = () => {
   const { modules } = useModule();
   const { lessonsToBeShown } = useLesson();
 
@@ -49,14 +50,14 @@ function Home() {
         </Title>
 
         <Section>
-          {modulesInAlphabeticalOrder ? (
-            modulesInAlphabeticalOrder.map((module) => (
-              <ButtonModule key={module.id} module={module} />
-            ))
-          ) : (
+          {modulesInAlphabeticalOrder.length === 0 ? (
             <span className="empty-modules">
               Não existem módulos para serem exibidos!
             </span>
+          ) : (
+            modulesInAlphabeticalOrder.map((module) => (
+              <ButtonModule key={module.id} module={module} />
+            ))
           )}
         </Section>
 
@@ -78,6 +79,6 @@ function Home() {
       </Content>
     </>
   );
-}
+};
 
 export { Home };

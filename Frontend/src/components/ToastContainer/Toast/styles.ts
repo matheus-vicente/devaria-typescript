@@ -60,13 +60,15 @@ export const Container = styled(animated.div)<ContainerProps>`
     color: inherit;
   }
 
-  ${(props) =>
-    !props.hasDescription &&
-    css`
-      align-items: center;
+  ${(props) => {
+    if (!props.hasDescription) {
+      return css`
+        align-items: center;
 
-      svg {
-        margin-top: 0;
-      }
-    `}
+        svg {
+          margin-top: 0;
+        }
+      `;
+    }
+  }}
 `;

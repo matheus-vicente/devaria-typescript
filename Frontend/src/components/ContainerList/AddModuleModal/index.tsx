@@ -14,16 +14,18 @@ import { Container } from "./styles";
 
 interface AddModuleModalProps {
   isOpen: boolean;
+  isEditing: boolean;
   onRequestClose(): void;
 }
 
 const AddModuleModal: React.FC<AddModuleModalProps> = ({
   isOpen,
+  isEditing,
   onRequestClose,
 }) => {
   const { requestOptions } = useAuth();
   const { addToast } = useToast();
-  const { modules, setModules } = useModule();
+  const { modules, setModules, selectedModuleByName } = useModule();
 
   const handleCreateModule = useCallback(
     async (data) => {
@@ -52,6 +54,67 @@ const AddModuleModal: React.FC<AddModuleModalProps> = ({
     [modules, setModules, addToast, requestOptions, onRequestClose]
   );
 
+  const handleEditModule = useCallback(
+    async (data) => {
+      try {
+        const modulesState = modules;
+        const module = modulesState.find(
+          (item) => item.name === selectedModuleByName
+        );
+
+        if (!module) {
+          throw new Error("Módulo informado não encontrado");
+        }
+
+        const request = {
+          name: data.name,
+        };
+
+        const response = await api.put(
+          `modules/${module.id}`,
+          request,
+          requestOptions()
+        );
+
+        modulesState.push(response.data);
+        const newState = modulesState.filter(
+          (item) => item.name !== selectedModuleByName
+        );
+
+        setModules(newState);
+        onRequestClose();
+
+        addToast({
+          title: "Módulo editado",
+          type: "success",
+          description: `Módulo editado com sucesso.`,
+        });
+      } catch (error) {
+        addToast({
+          title: "Erro na edição do módulo!",
+          type: "error",
+          description: error.message,
+        });
+      }
+    },
+    [
+      modules,
+      addToast,
+      setModules,
+      onRequestClose,
+      requestOptions,
+      selectedModuleByName,
+    ]
+  );
+
+  const handleSubmit = async (data: any) => {
+    if (isEditing) {
+      await handleEditModule(data);
+    } else {
+      await handleCreateModule(data);
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -71,7 +134,7 @@ const AddModuleModal: React.FC<AddModuleModalProps> = ({
       <Container>
         <h1>Novo módulo</h1>
 
-        <Form onSubmit={handleCreateModule}>
+        <Form onSubmit={handleSubmit}>
           <Input name="name" type="text" placeholder="Nome" />
 
           <Button type="submit">Adicionar</Button>

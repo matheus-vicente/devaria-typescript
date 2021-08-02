@@ -11,6 +11,8 @@ export type LessonData = {
 interface LessonContextData {
   lessons: LessonData[];
   setLessons(data: LessonData[]): void;
+  selectedLessonByName: string;
+  setSelectedLessonByName(name: string): void;
   lessonsToBeShown: LessonData[];
   setLessonsToBeShown(data: LessonData[]): void;
 }
@@ -19,6 +21,7 @@ const LessonContext = createContext({} as LessonContextData);
 
 const LessonProvider: React.FC = ({ children }) => {
   const [lessons, setLessons] = useState([] as LessonData[]);
+  const [selectedLessonByName, setSelectedLessonByName] = useState("");
   const [lessonsToBeShown, setLessonsToBeShown] = useState([] as LessonData[]);
 
   useEffect(() => {
@@ -33,7 +36,14 @@ const LessonProvider: React.FC = ({ children }) => {
 
   return (
     <LessonContext.Provider
-      value={{ lessons, setLessons, lessonsToBeShown, setLessonsToBeShown }}
+      value={{
+        lessons,
+        setLessons,
+        selectedLessonByName,
+        setSelectedLessonByName,
+        lessonsToBeShown,
+        setLessonsToBeShown,
+      }}
     >
       {children}
     </LessonContext.Provider>
