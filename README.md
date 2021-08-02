@@ -2,6 +2,13 @@
 
 Aplicação desenvolvida usando como referência o site de cursos [Devaria](https://devaria.com.br).
 
+### Requisitos da aplicação:
+1. É possível criar cadastro por meio de e-mail senha onde o e-mail não pode ser duplicado.
+1. É criado um token na autentição do usuário, com validade de 1 dia.
+1. São dois tipos de usuários, os administradores e os não administradores.
+1. Na homepage são exibidos os módulos e as aulas de cada módulo, na qual as aulas a serem exibidas são aulas do módulo selecionado.
+1. Para criação, edição e deleção de módulos e aulas, deve ter um perfil administrador.
+
 ## Backend
 
 1. Na raiz do projeto utilize o comando ``cd Backend`` para ter acesso à pasta onde está o código do backend.
