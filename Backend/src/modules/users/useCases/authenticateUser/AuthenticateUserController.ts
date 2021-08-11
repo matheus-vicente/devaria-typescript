@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { container } from "tsyringe";
 
 import { AuthenticateUserUseCase } from "./AuthenticateUserUseCase";
 
@@ -11,12 +12,12 @@ interface IUserResponse {
 }
 
 class AuthenticateUserController {
-  constructor(private authenticateUserUseCase: AuthenticateUserUseCase) {}
-
   async handle(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
 
-    const { user, token } = await this.authenticateUserUseCase.execute({
+    const authenticateUserUseCase = container.resolve(AuthenticateUserUseCase);
+
+    const { user, token } = await authenticateUserUseCase.execute({
       email,
       password,
     });

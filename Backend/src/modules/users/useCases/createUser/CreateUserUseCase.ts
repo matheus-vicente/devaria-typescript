@@ -1,8 +1,9 @@
 import { inject, injectable } from "tsyringe";
 
 import { AppError } from "../../../../errors/AppError";
-import { HashProvider } from "../../providers/HashProvider/implementation/HashProvider";
-import { UsersRepository } from "../../repositories/implementations/UsersRepository";
+import { User } from "../../entities/User";
+import { IHashProvider } from "../../providers/HashProvider/model/IHashProvider";
+import { IUsersRepository } from "../../repositories/IUsersRepository";
 
 interface IRequest {
   name: string;
@@ -10,24 +11,17 @@ interface IRequest {
   password: string;
 }
 
-interface IResponse {
-  name: string;
-  admin: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
-
 @injectable()
 class CreateUserUseCase {
   constructor(
     @inject("Users Repository")
-    private usersRepository: UsersRepository,
+    private usersRepository: IUsersRepository,
 
     @inject("Hash Provider")
-    private hashProvider: HashProvider
+    private hashProvider: IHashProvider
   ) {}
 
-  async execute({ name, email, password }: IRequest): Promise<IResponse> {
+  async execute({ name, email, password }: IRequest): Promise<User> {
     const emailAlreadyExists = await this.usersRepository.findByEmail(email);
 
     if (emailAlreadyExists) {
@@ -36,18 +30,11 @@ class CreateUserUseCase {
 
     const hashedPassword = await this.hashProvider.generate(password);
 
-    const userCreated = await this.usersRepository.create({
+    const user = await this.usersRepository.create({
       name,
       email,
       password: hashedPassword,
     });
-
-    const user: IResponse = {
-      name: userCreated.name,
-      admin: userCreated.admin,
-      created_at: userCreated.created_at,
-      updated_at: userCreated.updated_at,
-    };
 
     return user;
   }

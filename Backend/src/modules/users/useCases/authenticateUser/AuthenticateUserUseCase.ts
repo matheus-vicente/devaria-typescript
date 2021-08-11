@@ -3,8 +3,8 @@ import { sign } from "jsonwebtoken";
 import { jwt } from "../../../../config/authConfig";
 import { AppError } from "../../../../errors/AppError";
 import { User } from "../../entities/User";
-import { HashProvider } from "../../providers/HashProvider/implementation/HashProvider";
-import { UsersRepository } from "../../repositories/implementations/UsersRepository";
+import { IHashProvider } from "../../providers/HashProvider/model/IHashProvider";
+import { IUsersRepository } from "../../repositories/IUsersRepository";
 
 interface IRequest {
   email: string;
@@ -18,8 +18,8 @@ interface IResponse {
 
 class AuthenticateUserUseCase {
   constructor(
-    private usersRepository: UsersRepository,
-    private hashProvider: HashProvider
+    private usersRepository: IUsersRepository,
+    private hashProvider: IHashProvider
   ) {}
 
   async execute({ email, password }: IRequest): Promise<IResponse> {

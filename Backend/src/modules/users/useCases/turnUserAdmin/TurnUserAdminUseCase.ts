@@ -1,17 +1,11 @@
 import { AppError } from "../../../../errors/AppError";
-import { UsersRepository } from "../../repositories/implementations/UsersRepository";
-
-interface IResponse {
-  name: string;
-  admin: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
+import { User } from "../../entities/User";
+import { IUsersRepository } from "../../repositories/IUsersRepository";
 
 class TurnUserAdminUseCase {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepository: IUsersRepository) {}
 
-  async execute(id: string): Promise<IResponse> {
+  async execute(id: string): Promise<User> {
     const userExists = await this.usersRepository.findById(id);
 
     if (!userExists) {
@@ -20,14 +14,7 @@ class TurnUserAdminUseCase {
 
     userExists.admin = true;
 
-    const savedUser = await this.usersRepository.save(userExists);
-
-    const user: IResponse = {
-      name: savedUser.name,
-      admin: savedUser.admin,
-      created_at: savedUser.created_at,
-      updated_at: savedUser.updated_at,
-    };
+    const user = await this.usersRepository.save(userExists);
 
     return user;
   }
